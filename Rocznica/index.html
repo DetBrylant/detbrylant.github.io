@@ -189,26 +189,30 @@
 
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
 
-  /* FIX: scroll hint — ideally centered */
+  /* scroll hint — perfectly centered */
   .hero-scroll-hint {
     position: absolute;
     bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     animation: fadeUp 1.2s ease 1.4s both;
     z-index: 1;
+    padding: 0 1rem;
+    text-align: center;
   }
 
   .scroll-text {
     font-size: 0.6rem;
-    letter-spacing: 0.18rem;
+    letter-spacing: 0.12rem;
     text-transform: uppercase;
     color: var(--rose-light);
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    max-width: 240px;
   }
 
   .scroll-line {
@@ -264,7 +268,7 @@
     gap: 2px;
   }
 
-  /* Story card — gentle hover lift (no 3D tilt) */
+  /* Story card — gentle hover lift ONLY on desktop pointer devices */
   .story-card {
     padding: 3rem 2.5rem;
     background: var(--blush);
@@ -274,9 +278,9 @@
     overflow: hidden;
   }
 
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .story-card:hover {
-      transform: translateY(-6px) scale(1.015);
+      transform: translateY(-5px);
       box-shadow: var(--shadow-rose);
       z-index: 2;
     }
@@ -365,16 +369,6 @@
     border-radius: 4px;
     background: var(--petal);
     cursor: zoom-in;
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
-                box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-
-  @media (hover: hover) {
-    .gallery-item:hover {
-      transform: translateY(-4px) scale(1.012);
-      box-shadow: var(--shadow-rose);
-      z-index: 2;
-    }
   }
 
   /* aspect ratios per slot */
@@ -388,22 +382,27 @@
   .gallery-item:nth-child(5) { aspect-ratio: 3/4; }
   .gallery-item:nth-child(8) { aspect-ratio: 16/9; }
 
-  /* FIX: gallery images — plain CSS, no JS hide/show */
+  /* FIX: gallery images */
   .gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
     display: block;
-    transition: transform 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                filter 0.4s ease;
     filter: brightness(0.97) saturate(0.88);
-    background: var(--petal); /* shows while loading */
+    background: var(--petal);
+    transition: filter 0.4s ease;
   }
 
-  .gallery-item:hover img {
-    transform: scale(1.07);
-    filter: brightness(1.02) saturate(1.12);
+  /* Only zoom image on real pointer (not touch) devices */
+  @media (hover: hover) and (pointer: fine) {
+    .gallery-item img {
+      transition: transform 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.06);
+      filter: brightness(1.02) saturate(1.12);
+    }
   }
 
   .gallery-overlay {
@@ -1583,48 +1582,58 @@
 
 /* ══════════════════════════════════════════
    MESSENGER HEARTS — burst on page load
+   Używamy Web Animations API zamiast CSS var() w keyframes
    ══════════════════════════════════════════ */
 (function() {
   const HEART_EMOJIS = ['❤️','💖','💕','💗','💓','💞','💝','🩷','💘','💟'];
-  const BURST_COUNT  = 32;
+  const BURST_COUNT  = 30;
   const container    = document.getElementById('hearts-container');
 
-  function createBurstHeart(delay) {
+  function spawnHeart(delay) {
     const el = document.createElement('span');
-    el.className = 'messenger-heart';
     el.textContent = HEART_EMOJIS[Math.floor(Math.random() * HEART_EMOJIS.length)];
 
-    // Random horizontal position
-    const left  = 5 + Math.random() * 90;
-    // Random size
-    const size  = 1.2 + Math.random() * 2.2;
-    // Random horizontal drift (-50px … +50px)
-    const drift = (Math.random() - 0.5) * 100;
-    // Random duration 2.5s–4.2s
-    const dur   = 2.5 + Math.random() * 1.7;
-    // Random slight rotation swing
-    const rot   = (Math.random() - 0.5) * 40;
+    const left  = 5 + Math.random() * 90;          // % poziomo
+    const size  = 1.4 + Math.random() * 2.0;        // rem
+    const drift = (Math.random() - 0.5) * 120;      // px boczny dryf
+    const rot   = (Math.random() - 0.5) * 50;       // deg obrót
+    const dur   = 2800 + Math.random() * 1800;       // ms
 
-    el.style.cssText = `
-      position: absolute;
-      bottom: -60px;
-      left: ${left}%;
-      font-size: ${size}rem;
-      pointer-events: none;
-      will-change: transform, opacity;
-      animation: messengerFloat ${dur}s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}ms forwards;
-      --drift: ${drift}px;
-      --rot: ${rot}deg;
-    `;
+    Object.assign(el.style, {
+      position:   'absolute',
+      bottom:     '-80px',
+      left:       left + '%',
+      fontSize:   size + 'rem',
+      lineHeight: '1',
+      userSelect: 'none',
+      pointerEvents: 'none',
+      zIndex:     '5',         // ponad hearts-container (który ma z-index:1)
+      willChange: 'transform, opacity',
+    });
 
     container.appendChild(el);
-    setTimeout(() => el.remove(), delay + dur * 1000 + 200);
+
+    // Start po `delay` ms
+    setTimeout(function() {
+      el.animate([
+        { transform: 'translateY(0px) translateX(0px) rotate(0deg) scale(0.4)', opacity: 0 },
+        { transform: 'translateY(-12vh) translateX(' + (drift * 0.15) + 'px) rotate(' + (rot * 0.2) + 'deg) scale(1)',   opacity: 1,    offset: 0.08 },
+        { transform: 'translateY(-70vh) translateX(' + (drift * 0.7)  + 'px) rotate(' + (rot * 0.8) + 'deg) scale(0.95)', opacity: 0.9, offset: 0.75 },
+        { transform: 'translateY(-118vh) translateX(' + drift + 'px) rotate(' + rot + 'deg) scale(0.8)',                   opacity: 0 }
+      ], {
+        duration: dur,
+        easing:   'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        fill:     'forwards'
+      });
+
+      setTimeout(function() { el.remove(); }, dur + 100);
+    }, delay);
   }
 
-  // Stagger the burst: first heart fires immediately, last ~1200ms later
-  for (let i = 0; i < BURST_COUNT; i++) {
-    const delay = i * (1200 / BURST_COUNT) + Math.random() * 120;
-    createBurstHeart(delay);
+  // Wystrzeliwujemy wszystkie serduszka po załadowaniu DOM
+  for (var i = 0; i < BURST_COUNT; i++) {
+    var delay = i * (1400 / BURST_COUNT) + Math.random() * 80;
+    spawnHeart(delay);
   }
 })();
 
