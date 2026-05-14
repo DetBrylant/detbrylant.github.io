@@ -40,16 +40,17 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    will-change: transform;
+    opacity: 0.55;
   }
 
-  /* ── FLOATING HEARTS ── */
+  /* ── FLOATING HEARTS (stałe tło — zawsze pod treścią) ── */
   #hearts-container {
     position: fixed;
     inset: 0;
     z-index: 1;
     pointer-events: none;
     overflow: hidden;
+    opacity: 0.7;
   }
 
   .heart-float {
@@ -263,22 +264,22 @@
     gap: 2px;
   }
 
-  /* 3D Tilt card effect */
+  /* Story card — gentle hover lift (no 3D tilt) */
   .story-card {
     padding: 3rem 2.5rem;
     background: var(--blush);
-    transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1),
-                box-shadow 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
-    will-change: transform;
-    transform-style: preserve-3d;
-    transform-origin: center center;
   }
 
-  .story-card:hover {
-    box-shadow: var(--shadow-rose);
-    z-index: 2;
+  @media (hover: hover) {
+    .story-card:hover {
+      transform: translateY(-6px) scale(1.015);
+      box-shadow: var(--shadow-rose);
+      z-index: 2;
+    }
   }
 
   .story-card::before {
@@ -364,9 +365,16 @@
     border-radius: 4px;
     background: var(--petal);
     cursor: zoom-in;
-    /* 3D tilt support */
-    transform-style: preserve-3d;
-    will-change: transform;
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @media (hover: hover) {
+    .gallery-item:hover {
+      transform: translateY(-4px) scale(1.012);
+      box-shadow: var(--shadow-rose);
+      z-index: 2;
+    }
   }
 
   /* aspect ratios per slot */
@@ -898,7 +906,7 @@
   #lightbox {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: 99999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1061,6 +1069,25 @@
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ── MESSENGER HEARTS burst (on load) ── */
+  @keyframes messengerFloat {
+    0%   {
+      transform: translateY(0) translateX(0) rotate(0deg) scale(0.5);
+      opacity: 0;
+    }
+    8%   {
+      opacity: 1;
+      transform: translateY(-8vh) translateX(calc(var(--drift) * 0.1)) rotate(calc(var(--rot) * 0.1)) scale(1);
+    }
+    85%  {
+      opacity: 0.85;
+    }
+    100% {
+      transform: translateY(-115vh) translateX(var(--drift)) rotate(var(--rot)) scale(0.85);
+      opacity: 0;
     }
   }
 
@@ -1555,39 +1582,50 @@
 })();
 
 /* ══════════════════════════════════════════
-   3D TILT EFFECT for cards & gallery items
+   MESSENGER HEARTS — burst on page load
    ══════════════════════════════════════════ */
 (function() {
-  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const MAX_TILT = isMobile ? 4 : 8; // degrees
+  const HEART_EMOJIS = ['❤️','💖','💕','💗','💓','💞','💝','🩷','💘','💟'];
+  const BURST_COUNT  = 32;
+  const container    = document.getElementById('hearts-container');
 
-  function attachTilt(el) {
-    function onMove(cx, cy) {
-      const rect = el.getBoundingClientRect();
-      const rx = (cy - rect.top  - rect.height / 2) / (rect.height / 2);
-      const ry = (cx - rect.left - rect.width  / 2) / (rect.width  / 2);
-      el.style.transform = `perspective(600px) rotateX(${-rx * MAX_TILT}deg) rotateY(${ry * MAX_TILT}deg) scale(1.025)`;
-    }
+  function createBurstHeart(delay) {
+    const el = document.createElement('span');
+    el.className = 'messenger-heart';
+    el.textContent = HEART_EMOJIS[Math.floor(Math.random() * HEART_EMOJIS.length)];
 
-    function onLeave() {
-      el.style.transform = '';
-      el.style.transition = 'transform 0.55s cubic-bezier(0.23,1,0.32,1)';
-      setTimeout(() => { el.style.transition = ''; }, 600);
-    }
+    // Random horizontal position
+    const left  = 5 + Math.random() * 90;
+    // Random size
+    const size  = 1.2 + Math.random() * 2.2;
+    // Random horizontal drift (-50px … +50px)
+    const drift = (Math.random() - 0.5) * 100;
+    // Random duration 2.5s–4.2s
+    const dur   = 2.5 + Math.random() * 1.7;
+    // Random slight rotation swing
+    const rot   = (Math.random() - 0.5) * 40;
 
-    if (isMobile) {
-      el.addEventListener('touchmove', e => {
-        const t = e.touches[0];
-        onMove(t.clientX, t.clientY);
-      }, { passive: true });
-      el.addEventListener('touchend', onLeave, { passive: true });
-    } else {
-      el.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
-      el.addEventListener('mouseleave', onLeave);
-    }
+    el.style.cssText = `
+      position: absolute;
+      bottom: -60px;
+      left: ${left}%;
+      font-size: ${size}rem;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: messengerFloat ${dur}s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}ms forwards;
+      --drift: ${drift}px;
+      --rot: ${rot}deg;
+    `;
+
+    container.appendChild(el);
+    setTimeout(() => el.remove(), delay + dur * 1000 + 200);
   }
 
-  document.querySelectorAll('.tilt-card').forEach(attachTilt);
+  // Stagger the burst: first heart fires immediately, last ~1200ms later
+  for (let i = 0; i < BURST_COUNT; i++) {
+    const delay = i * (1200 / BURST_COUNT) + Math.random() * 120;
+    createBurstHeart(delay);
+  }
 })();
 
 /* ══════════════════════════════════════════
