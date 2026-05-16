@@ -34,13 +34,274 @@
     cursor: default;
   }
 
-  /* ── CANVAS BACKGROUND ── */
-  #canvas-bg {
+  /* ── PRELOADER ── */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: linear-gradient(145deg, #fde8ef 0%, #f7c8d8 40%, #f0a8c0 70%, #fde8ef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+  }
+
+  #preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .preloader-heart {
+    font-size: 4rem;
+    animation: preloaderPulse 1s ease infinite;
+    filter: drop-shadow(0 0 20px rgba(192,57,90,0.45));
+  }
+
+  @keyframes preloaderPulse {
+    0%, 100% { transform: scale(1); }
+    15%       { transform: scale(1.25); }
+    30%       { transform: scale(1); }
+    45%       { transform: scale(1.15); }
+    60%       { transform: scale(1); }
+  }
+
+  /* ── CSS ANIMATED GRADIENT BACKGROUND ── */
+  #css-bg {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.55;
+    background: linear-gradient(
+      120deg,
+      #fff0f5 0%,
+      #ffe0ec 20%,
+      #ffd6e7 35%,
+      #ffe8f0 50%,
+      #fff0f5 65%,
+      #ffd0e5 80%,
+      #ffe8f0 100%
+    );
+    background-size: 300% 300%;
+    animation: gradientShift 18s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    25%  { background-position: 100% 0%; }
+    50%  { background-position: 100% 100%; }
+    75%  { background-position: 0% 100%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* soft blurred orbs layered on top */
+  #css-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 55% 45% at 20% 25%, rgba(247,168,191,0.45) 0%, transparent 70%),
+      radial-gradient(ellipse 45% 55% at 80% 75%, rgba(232,82,122,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 60% 10%, rgba(253,232,239,0.55) 0%, transparent 60%);
+    animation: orbsDrift 24s ease-in-out infinite alternate;
+    filter: blur(2px);
+  }
+
+  @keyframes orbsDrift {
+    0%   { opacity: 0.7; transform: scale(1) translateY(0px); }
+    50%  { opacity: 1;   transform: scale(1.04) translateY(-12px); }
+    100% { opacity: 0.8; transform: scale(0.98) translateY(8px); }
+  }
+
+  /* ── CSS PARTICLES OVERLAY CONTAINER ── */
+  #css-particles-container {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* ── CSS PARTICLES (no cursor reaction) ── */
+  .css-particle {
+    position: absolute;
+    bottom: -2rem;
+    pointer-events: none;
+    animation: cssParticleFloat linear infinite;
+    will-change: transform, opacity;
+    color: var(--rose-light);
+    user-select: none;
+    line-height: 1;
+  }
+
+  @keyframes cssParticleFloat {
+    0%   { transform: translateY(0) rotate(0deg) scale(0.85);   opacity: 0; }
+    6%   { opacity: 0.55; }
+    88%  { opacity: 0.25; }
+    100% { transform: translateY(-105vh) rotate(22deg) scale(1.05); opacity: 0; }
+  }
+
+  /* ── MUSIC BUTTON ── */
+  #music-btn {
+    position: fixed;
+    left: 1.2rem;
+    bottom: 1.4rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(232,82,122,0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(192,57,90,0.15);
+    transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    color: var(--crimson);
+  }
+
+  #music-btn:hover {
+    background: rgba(255,255,255,0.82);
+    transform: scale(1.12);
+    box-shadow: 0 6px 22px rgba(192,57,90,0.25);
+  }
+
+  #music-btn svg { pointer-events: none; }
+
+  /* ── EASTER EGG FOOTER ── */
+  #easter-footer {
+    background: var(--text-dark);
+    padding: 1.4rem 1rem 1.6rem;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  #easter-trigger {
+    display: inline-block;
+    color: rgba(255,255,255,0.12);
+    font-size: 0.6rem;
+    letter-spacing: 0.08rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    user-select: none;
+    background: none;
+    border: none;
+    font-family: 'Jost', sans-serif;
+  }
+
+  #easter-trigger:hover { color: rgba(255,255,255,0.35); }
+
+  /* ── EASTER EGG MODAL ── */
+  #frog-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  #frog-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #frog-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(28, 6, 14, 0.65);
+    backdrop-filter: blur(18px) saturate(0.6);
+    -webkit-backdrop-filter: blur(18px) saturate(0.6);
+  }
+
+  .frog-box {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(145deg, #fff5f8 0%, #ffe8f0 100%);
+    border: 1px solid rgba(232,82,122,0.25);
+    border-radius: 20px;
+    padding: 3rem 2.5rem 2.5rem;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: 0 24px 70px rgba(58,26,36,0.28), 0 0 0 1px rgba(255,255,255,0.5) inset;
+    animation: frogBoxIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  #frog-modal:not(.open) .frog-box { animation: none; }
+
+  @keyframes frogBoxIn {
+    from { transform: scale(0.75) translateY(20px); opacity: 0; }
+    to   { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  #frog-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(232,82,122,0.1);
+    border: 1px solid rgba(232,82,122,0.22);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--crimson);
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  #frog-close:hover { background: rgba(232,82,122,0.22); transform: rotate(90deg); }
+
+  .frog-emoji {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: frogWiggle 2.5s ease infinite;
+  }
+
+  @keyframes frogWiggle {
+    0%,100% { transform: rotate(0deg); }
+    20% { transform: rotate(-8deg) scale(1.08); }
+    40% { transform: rotate(8deg) scale(1.08); }
+    60% { transform: rotate(0deg); }
+  }
+
+  .frog-question {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text-dark);
+    margin-bottom: 1.8rem;
+    line-height: 1.4;
+  }
+
+  #frog-btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    font-style: italic;
+    color: white;
+    background: linear-gradient(135deg, var(--crimson), var(--rose));
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 2.2rem;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 20px rgba(192,57,90,0.3);
+    letter-spacing: 0.03rem;
+  }
+
+  #frog-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 28px rgba(192,57,90,0.4);
   }
 
   /* ── FLOATING HEARTS (stałe tło — zawsze pod treścią) ── */
@@ -84,8 +345,9 @@
     justify-content: center;
     text-align: center;
     padding: 2rem 1.5rem;
-    background: linear-gradient(145deg, #fff0f5 0%, #ffe4ed 30%, #ffd6e7 60%, #ffcce3 100%);
+    background: transparent;
     overflow: hidden;
+
   }
 
   .hero-glow {
@@ -231,7 +493,7 @@
   /* ── STORY SECTION ── */
   #story {
     padding: 7rem 1.5rem;
-    background: var(--white);
+    background: rgba(255, 255, 255, 0.75);
   }
 
   .section-label {
@@ -339,7 +601,7 @@
   /* ── GALLERY ── */
   #gallery {
     padding: 7rem 1.5rem;
-    background: linear-gradient(180deg, #fff5f8 0%, #ffe9f0 100%);
+    background: rgba(253, 232, 239, 0.4);
   }
 
   /* 9-photo bento grid: 3x3 desktop */
@@ -546,7 +808,7 @@
   /* ── COUNTER ── */
   #counter {
     padding: 7rem 1.5rem;
-    background: linear-gradient(135deg, #fff0f5 0%, #ffe4ed 50%, #ffd6e7 100%);
+    background: rgba(255, 255, 255, 0.75);
   }
 
   .counter-inner {
@@ -1110,8 +1372,46 @@
 </head>
 <body>
 
-<!-- Animated gradient canvas (also handles mouse-reactive particles) -->
-<canvas id="canvas-bg"></canvas>
+<!-- Preloader -->
+<div id="preloader">
+  <span class="preloader-heart">💕</span>
+</div>
+
+<!-- CSS animated background (replaces canvas) -->
+<div id="css-bg"></div>
+
+<!-- CSS particles overlay (z-index: 3, above all content) -->
+<div id="css-particles-container"></div>
+
+<!-- Music button -->
+<button id="music-btn" aria-label="Włącz/wycisz muzykę" title="Muzyka">
+  <svg id="music-icon-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/>
+    <circle cx="18" cy="16" r="3"/>
+  </svg>
+  <svg id="music-icon-off" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/>
+    <circle cx="18" cy="16" r="3"/>
+    <line x1="2" y1="2" x2="22" y2="22" stroke="var(--rose)" stroke-width="2"/>
+  </svg>
+</button>
+
+<!-- Easter Egg Modal (Żabka) -->
+<div id="frog-modal" role="dialog" aria-modal="true" aria-label="Żabka">
+  <div id="frog-backdrop"></div>
+  <div class="frog-box">
+    <button id="frog-close" aria-label="Zamknij">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/>
+      </svg>
+    </button>
+    <span class="frog-emoji">🐸</span>
+    <p class="frog-question">Jak robi Żabka?</p>
+    <button id="frog-btn">Klikaj i sprawdź</button>
+  </div>
+</div>
 
 <!-- Floating hearts -->
 <div id="hearts-container"></div>
@@ -1181,22 +1481,22 @@
   </div>
 
   <div class="story-grid">
-    <div class="story-card reveal tilt-card">
+    <div class="story-card reveal">
       <div class="story-num">I</div>
       <h3>Pierwszy moment</h3>
       <p>Był taki dzień, kiedy wszystko zmieniło się w jednej chwili. Spojrzenie, uśmiech, słowa i czułem, że coś się zaczyna.</p>
     </div>
-    <div class="story-card reveal reveal-delay-1 tilt-card">
+    <div class="story-card reveal reveal-delay-1">
       <div class="story-num">II</div>
       <h3>Pierwsze spacery</h3>
       <p>Godziny rozmów, śmiech, milczenie każda chwila z Tobą nabrała nowego sensu. Odkryłem, że czas może być piękny.</p>
     </div>
-    <div class="story-card reveal reveal-delay-2 tilt-card">
+    <div class="story-card reveal reveal-delay-2">
       <div class="story-num">III</div>
       <h3>Wspólne chwile</h3>
       <p>Każdy dzień budujemy coś naszego nasze miejsca, nasze żarty, które rozumiemy tylko my dwoje.</p>
     </div>
-    <div class="story-card reveal reveal-delay-3 tilt-card">
+    <div class="story-card reveal reveal-delay-3">
       <div class="story-num">IV</div>
       <h3>Dziś i jutro</h3>
       <p>Rok minął jak dla mnie zbyt szybko. I cieszę się, że mogę dzielić swój dzień z Tobą dziś, i pojutrze, i każdego dnia potem.</p>
@@ -1216,39 +1516,39 @@
   </div>
 
   <div class="gallery-grid">
-    <div class="gallery-item reveal tilt-card">
+    <div class="gallery-item reveal">
       <img src="zdjecie1.jpg" alt="Wspomnienie 1" loading="lazy">
       <div class="gallery-overlay"><span>Nasz pierwszy dzień</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-1 tilt-card">
+    <div class="gallery-item reveal reveal-delay-1">
       <img src="zdjecie2.jpg" alt="Wspomnienie 2" loading="lazy">
       <div class="gallery-overlay"><span>Nasz uśmiech</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-2 tilt-card">
+    <div class="gallery-item reveal reveal-delay-2">
       <img src="zdjecie3.jpg" alt="Wspomnienie 3" loading="lazy">
       <div class="gallery-overlay"><span>Piękna chwila</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-1 tilt-card">
+    <div class="gallery-item reveal reveal-delay-1">
       <img src="zdjecie4.jpg" alt="Wspomnienie 4" loading="lazy">
       <div class="gallery-overlay"><span>Razem w podróży</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-2 tilt-card">
+    <div class="gallery-item reveal reveal-delay-2">
       <img src="zdjecie5.jpg" alt="Wspomnienie 5" loading="lazy">
       <div class="gallery-overlay"><span>Tylko my</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-3 tilt-card">
+    <div class="gallery-item reveal reveal-delay-3">
       <img src="zdjecie6.jpg" alt="Wspomnienie 6" loading="lazy">
       <div class="gallery-overlay"><span>Niezapomniane chwile</span></div>
     </div>
-    <div class="gallery-item reveal tilt-card">
+    <div class="gallery-item reveal">
       <img src="zdjecie7.jpg" alt="Wspomnienie 7" loading="lazy">
       <div class="gallery-overlay"><span>Magiczny moment</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-1 tilt-card">
+    <div class="gallery-item reveal reveal-delay-1">
       <img src="zdjecie8.jpg" alt="Wspomnienie 8" loading="lazy">
       <div class="gallery-overlay"><span>Nasze miejsce</span></div>
     </div>
-    <div class="gallery-item reveal reveal-delay-2 tilt-card">
+    <div class="gallery-item reveal reveal-delay-2">
       <img src="zdjecie9.jpg" alt="Wspomnienie 9" loading="lazy">
       <div class="gallery-overlay"><span>Rok pełen miłości</span></div>
     </div>
@@ -1334,140 +1634,137 @@
   </div>
 </section>
 
+<!-- ═══════════════ EASTER EGG FOOTER ═══════════════ -->
+<footer id="easter-footer">
+  <button id="easter-trigger" aria-label="Sekret">♥</button>
+</footer>
+
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script>
 /* ══════════════════════════════════════════
-   CANVAS — animated gradient orbs +
-   MOUSE-REACTIVE PARTICLE SYSTEM
+   PRELOADER
    ══════════════════════════════════════════ */
 (function() {
-  const canvas = document.getElementById('canvas-bg');
-  const ctx    = canvas.getContext('2d');
-  let w, h, t = 0;
-  let lastTime = 0;
-  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const TARGET_FPS = isMobile ? 24 : 30;
-  const FRAME_MS   = 1000 / TARGET_FPS;
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      document.getElementById('preloader').classList.add('hidden');
+    }, 2000);
+  });
+})();
 
-  // Mouse / touch tracking
-  let mouseX = -9999, mouseY = -9999;
-  const REPEL_RADIUS = 90;
-  const REPEL_FORCE  = 1.4;
+/* ══════════════════════════════════════════
+   CSS PARTICLES — injected on DOMContentLoaded
+   ══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('css-particles-container');
+  if (!container) return;
 
-  document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
-  document.addEventListener('touchmove', e => {
-    mouseX = e.touches[0].clientX;
-    mouseY = e.touches[0].clientY;
-  }, { passive: true });
-  document.addEventListener('touchend', () => { mouseX = -9999; mouseY = -9999; }, { passive: true });
+  const symbols = ['♥', '✦', '♡', '✿', '❀', '•'];
+  const COUNT = 28;
 
-  // Background orbs
-  const orbs = [
-    { xBase: 0.28, xAmp: 0.14, xFreq: 0.65, yBase: 0.28, yAmp: 0.10, yFreq: 0.48, r: 0.42, cr: 247, cg: 168, cb: 191, ca: 0.18 },
-    { xBase: 0.72, xAmp: 0.11, xFreq: 0.82, yBase: 0.52, yAmp: 0.14, yFreq: 0.58, r: 0.38, cr: 232, cg: 82,  cb: 122, ca: 0.10 },
-    { xBase: 0.50, xAmp: 0.17, xFreq: 1.05, yBase: 0.78, yAmp: 0.10, yFreq: 0.75, r: 0.33, cr: 253, cg: 232, cb: 239, ca: 0.22 },
-  ];
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('div');
+    el.className = 'css-particle';
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
 
-  // Particle system
-  const PARTICLE_COUNT = isMobile ? 28 : 55;
-  const particles = [];
+    const dur   = 10 + Math.random() * 10;   // 10s–20s
+    const delay = -(Math.random() * dur);     // ujemny = od razu w ruchu
 
-  function initParticles() {
-    particles.length = 0;
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      particles.push(makeParticle());
+    el.style.left              = (Math.random() * 100) + '%';
+    el.style.fontSize          = (0.5 + Math.random() * 0.7) + 'rem';
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay    = delay + 's';
+
+    container.appendChild(el);
+  }
+});
+
+/* ══════════════════════════════════════════
+   MUSIC BUTTON
+   ══════════════════════════════════════════ */
+(function() {
+  const audio = new Audio('muzyka.mp3');
+  audio.loop   = true;
+  audio.volume = 0.40;
+  let started  = false;
+  let muted    = false;
+
+  const btn     = document.getElementById('music-btn');
+  const iconOn  = document.getElementById('music-icon-on');
+  const iconOff = document.getElementById('music-icon-off');
+
+  function updateIcon() {
+    if (muted) {
+      iconOn.style.display  = 'none';
+      iconOff.style.display = '';
+    } else {
+      iconOn.style.display  = '';
+      iconOff.style.display = 'none';
     }
   }
 
-  function makeParticle() {
-    const symbols = ['♥','✦','♡','·','✿','*'];
-    return {
-      x:    Math.random() * w,
-      y:    Math.random() * h,
-      vx:   (Math.random() - 0.5) * 0.35,
-      vy:   (Math.random() - 0.5) * 0.35,
-      size: 0.5 + Math.random() * 2.2,
-      alpha: 0.06 + Math.random() * 0.18,
-      sym:  Math.random() > 0.65 ? symbols[Math.floor(Math.random() * symbols.length)] : null,
-      col:  Math.random() > 0.5 ? `rgba(232,82,122,` : `rgba(247,168,191,`,
-    };
+  function tryPlay() {
+    if (started) return;
+    started = true;
+    audio.play().catch(() => { started = false; });
   }
 
-  function resize() {
-    w = canvas.width  = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    initParticles();
-  }
-  resize();
-  window.addEventListener('resize', resize, { passive: true });
-
-  function draw(now) {
-    requestAnimationFrame(draw);
-    const elapsed = now - lastTime;
-    if (elapsed < FRAME_MS) return;
-    lastTime = now - (elapsed % FRAME_MS);
-
-    t += 0.0025;
-    ctx.clearRect(0, 0, w, h);
-
-    const maxDim = Math.max(w, h);
-
-    // Draw gradient orbs
-    for (let i = 0; i < orbs.length; i++) {
-      const o  = orbs[i];
-      const ox = (o.xBase + o.xAmp * Math.sin(t * o.xFreq)) * w;
-      const oy = (o.yBase + o.yAmp * Math.cos(t * o.yFreq)) * h;
-      const rad = o.r * maxDim;
-      const grd = ctx.createRadialGradient(ox, oy, 0, ox, oy, rad);
-      grd.addColorStop(0, `rgba(${o.cr},${o.cg},${o.cb},${o.ca})`);
-      grd.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = grd;
-      ctx.fillRect(0, 0, w, h);
+  btn.addEventListener('click', function() {
+    if (!started) {
+      tryPlay();
+      muted = false;
+    } else {
+      muted = !muted;
+      audio.muted = muted;
     }
+    updateIcon();
+  });
 
-    // Draw + update particles
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-
-      // Mouse repulsion
-      const dx = p.x - mouseX;
-      const dy = p.y - mouseY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < REPEL_RADIUS && dist > 0) {
-        const force = (REPEL_RADIUS - dist) / REPEL_RADIUS * REPEL_FORCE;
-        p.vx += (dx / dist) * force * 0.08;
-        p.vy += (dy / dist) * force * 0.08;
-      }
-
-      // Dampen velocity
-      p.vx *= 0.985;
-      p.vy *= 0.985;
-
-      p.x += p.vx;
-      p.y += p.vy;
-
-      // Wrap around
-      if (p.x < -10) p.x = w + 10;
-      if (p.x > w + 10) p.x = -10;
-      if (p.y < -10) p.y = h + 10;
-      if (p.y > h + 10) p.y = -10;
-
-      // Draw
-      ctx.globalAlpha = p.alpha;
-      if (p.sym) {
-        ctx.font = `${p.size * 5}px serif`;
-        ctx.fillStyle = p.col + p.alpha + ')';
-        ctx.fillText(p.sym, p.x, p.y);
-      } else {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.col + p.alpha + ')';
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-    }
+  // Auto-start on first interaction
+  function autoStart() {
+    tryPlay();
+    document.removeEventListener('click',      autoStart);
+    document.removeEventListener('touchstart', autoStart);
+    document.removeEventListener('scroll',     autoStart);
   }
-  requestAnimationFrame(draw);
+
+  document.addEventListener('click',      autoStart, { passive: true });
+  document.addEventListener('touchstart', autoStart, { passive: true });
+  document.addEventListener('scroll',     autoStart, { passive: true, once: true });
+})();
+
+/* ══════════════════════════════════════════
+   EASTER EGG — Żabka
+   ══════════════════════════════════════════ */
+(function() {
+  const trigger  = document.getElementById('easter-trigger');
+  const modal    = document.getElementById('frog-modal');
+  const closeBtn = document.getElementById('frog-close');
+  const backdrop = document.getElementById('frog-backdrop');
+  const frogBtn  = document.getElementById('frog-btn');
+
+  function openModal() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    frogBtn.textContent = 'Klikaj i sprawdź';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  trigger.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+
+  frogBtn.addEventListener('click', function() {
+    frogBtn.textContent = 'kum kum! 🐸';
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
 })();
 
 /* ══════════════════════════════════════════
@@ -1881,25 +2178,7 @@
   });
 })();
 
-/* ══════════════════════════════════════════
-   MUZYKA W TLE
-   ══════════════════════════════════════════ */
-(function() {
-  const audio = new Audio('muzyka.mp3');
-  audio.loop   = true;
-  audio.volume = 0.40;
-  let started  = false;
 
-  function tryPlay() {
-    if (started) return;
-    started = true;
-    audio.play().catch(() => { started = false; });
-  }
-
-  document.addEventListener('click',      tryPlay, { passive: true });
-  document.addEventListener('touchstart', tryPlay, { passive: true });
-  document.addEventListener('scroll',     tryPlay, { passive: true, once: true });
-})();
 </script>
 </body>
 </html>
